@@ -16,14 +16,33 @@ import java.util.Set;
 @Configuration
 public class RedisConfig {
 
-    @Value("${spring.redis.cluster.nodes}")
+    @Value("${jedisCluster.nodes}")
     private String clusterNodes;
 
-    @Value("${spring.redis.cluster.max-redirects}")
-    private String max_redirects;
-
-    @Value("${spring.redis.password}")
+    @Value("${jedisCluster.password}")
     private String password;
+
+    @Value("${jedisCluster.timeout:20000}")
+    private int connectionTimeout;
+
+    @Value("${jedisCluster.pool.max-active:8}")
+    private int maxActive;
+
+    @Value("${jedisCluster.pool.max-idle:1000}")
+    private int maxIdle;
+
+    @Value("${jedisCluster.pool.min-idle:0}")
+    private int minIdle;
+
+    @Value("${jedisCluster.pool.max-wait:-1}")
+    private int maxWait;
+
+    @Value("${jedisCluster.soTimeout:2000}")
+    private int soTimeout;
+
+    @Value("${jedisCluster.maxAttempts:5}")
+    private int maxAttempts;
+
 
     @Bean
     public JedisCluster getJedisCluster() {
@@ -36,8 +55,13 @@ public class RedisConfig {
             String[] hp = node.split(":");
             nodes.add(new HostAndPort(hp[0], Integer.parseInt(hp[1])));
         }
+        System.out.println("---------------------------" + maxActive);
+        GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
+        poolConfig.setMaxIdle(maxIdle);
+        poolConfig.setMinIdle(minIdle);
+        poolConfig.setMaxWaitMillis(maxWait);
         //创建Redis集群对象
-        JedisCluster jedisCluster = new JedisCluster(nodes,5000,1000,1,password,new GenericObjectPoolConfig());
+        JedisCluster jedisCluster = new JedisCluster(nodes, connectionTimeout, soTimeout, maxAttempts, password, poolConfig);
         return jedisCluster;
     }
 }

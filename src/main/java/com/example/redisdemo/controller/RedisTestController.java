@@ -1,13 +1,16 @@
 package com.example.redisdemo.controller;
 
+import com.example.redisdemo.utils.CollectionsUtils11;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import redis.clients.jedis.JedisCluster;
 
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = "redis")
@@ -35,7 +38,14 @@ public class RedisTestController {
 
 
         String name = "";
-        name = jedisCluster.get("name");
+        Set<String> stringSet = new HashSet<String>();
+        stringSet.add("S01");
+        stringSet.add("S02");
+        StringUtils.toStringArray(stringSet);
+
+        String[] stringArray = CollectionsUtils11.toArray(stringSet);
+        System.out.println(stringArray);
+//        name = jedisCluster.get("name");
         return "success " + name;
     }
 }
